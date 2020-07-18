@@ -2,16 +2,13 @@ package 五子棋;
 
 import java.util.Scanner;
 
-public class WhiteChess extends Chess {
-
-    String name;
-
-    public WhiteChess(String name){
-        this.name = name;
+public class HumanPlayer extends Player {
+    public HumanPlayer(String name){
+        super(name);
     }
 
     @Override
-    public int[] playchess() {
+    public int[] playChess() {
         Scanner play = new Scanner(System.in);
         int [] select= new int [2];
 
@@ -22,8 +19,4 @@ public class WhiteChess extends Chess {
         return select;
     }
 
-    @Override
-    String getName() {
-        return name;
-    }
 }

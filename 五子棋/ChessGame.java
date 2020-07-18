@@ -5,9 +5,9 @@ import java.util.Scanner;
 public class ChessGame {
 
     private Scanner input = new Scanner(System.in);
-    private String[][] ChessBoard;
-    private Chess blackChess;
-    private Chess whiteChess;
+    private String[][] chessBoard;
+    private Player blackPlayer;
+    private Player whitePlayer;
     private int count;
     private boolean win;
 
@@ -16,46 +16,40 @@ public class ChessGame {
     }
 
     private ChessGame() {
-        gamestart();
     }
 
-    public void gamestart(){
-        select();
-        displayboard();
-        Chessboard();
+    public void startGame() {
+        selectPlayMode();
+        displayBoard();
+        playChessUntilGameOver();
     }
 
-    public void select() {
-
+    private void selectPlayMode() {
         int select;
 
         do {
             System.out.println("歡迎來到五子棋對戰");
             System.out.println("請選擇，1.玩家PK，2.人機對戰");
             select = input.nextInt();
-
         } while (select < 1 || select > 2);
 
         if (select == 1) {
             System.out.println("您選擇的是玩家PK");
             System.out.println("請輸入您的名稱");
-            blackChess = new BlackChess(input.next());
+            blackPlayer = new HumanPlayer(input.next());
             System.out.println("請輸入對方的名稱");
-            whiteChess = new BlackChess(input.next());
-
-
-        } else if (select == 2) {
+            whitePlayer = new HumanPlayer(input.next());
+        } else {
             System.out.println("您選擇的是人機對戰");
             System.out.println("請輸入您的名稱");
-            blackChess = new BlackChess(input.next());
-            whiteChess = new AiChess(this);
-
+            blackPlayer = new HumanPlayer(input.next());
+            whitePlayer = new AiPlayer(this);
         }
-        SetUpSize();
+
+        setUpSize();
     }
 
-    public void SetUpSize() {
-
+    public void setUpSize() {
         int size;
 
         do {
@@ -68,47 +62,45 @@ public class ChessGame {
 
     }
 
-    public void initialization(int InuptSize) {
-
+    public void initialization(int inputSize) {
         win = false;
-        ChessBoard = new String[InuptSize][InuptSize];
-        for (int i = 0; i < InuptSize; i++) {
-            for (int j = 0; j < InuptSize; j++) {
-                ChessBoard[i][j] = "-";
-
+        chessBoard = new String[inputSize][inputSize];
+        for (int i = 0; i < inputSize; i++) {
+            for (int j = 0; j < inputSize; j++) {
+                chessBoard[i][j] = "-";
             }
         }
     }
 
-    public void Chessboard() {
+    public void playChessUntilGameOver() {
+        int length = chessBoard.length;
 
-        int x[], y[];
-        int length = ChessBoard.length;
+        while (!win) {
+            playChess(length, blackPlayer, "x");
+            playChess(length, whitePlayer, "o");
+        }
 
-        while (true) {
-            System.out.println(blackChess.getName() + "請選擇下的座標(x,y)");
-            do {
-                x = blackChess.playchess();
-            } while (x[0] > length - 1 || x[0] < 0 || x[1] > length - 1 || x[1] < 0 || ChessBoard[x[0]][x[1]].equals("-") == false);
-            ChessBoard[x[0]][x[1]] = "x";
-            displayboard();
-            CheckWin(blackChess.getName(), x[0], x[1]);
-            count++;
-            if (count == length * length) {
-                Gameover(blackChess.getName());
-            }
+        System.out.println("要重來一局嗎Y/N");
+        if (input.next().equals("Y")) {
+            startGame();
+        } else if (input.next().equals("N")) {
+            System.exit(0);
+        }
+    }
 
-            System.out.println(whiteChess.getName() + "請選擇下的座標(x,y)");
-            do {
-                y = whiteChess.playchess();
-            } while (y[0] > length - 1 || y[0] < 0 || y[1] > length - 1|| y[1] < 0 || ChessBoard[y[0]][y[1]].equals("-") == false);
-            ChessBoard[y[0]][y[1]] = "o";
-            displayboard();
-            CheckWin(whiteChess.getName(), y[0], y[1]);
-            count++;
-            if (count == length * length) {
-                Gameover(whiteChess.getName());
-            }
+    private void playChess(int length, Player blackPlayer, String chessSymbol) {
+        int[] x;
+        System.out.println(blackPlayer.getName() + "請選擇下的座標(x,y)");
+        do {
+            x = blackPlayer.playChess();
+        } while (x[0] > length - 1 || x[0] < 0 || x[1] > length - 1 ||
+                x[1] < 0 || !chessBoard[x[0]][x[1]].equals("-"));
+        chessBoard[x[0]][x[1]] = chessSymbol;
+        displayBoard();
+        checkWinner(blackPlayer.getName(), x[0], x[1]);
+        count++;
+        if (count == length * length) {
+            printGameOver(blackPlayer.getName());
         }
     }
 
@@ -116,127 +108,133 @@ public class ChessGame {
         return ChessGameInstance.game;
     }
 
-    public void displayboard() {
-
-        for (int i = 0; i < ChessBoard.length; i++) {
+    public void displayBoard() {
+        for (int i = 0; i < chessBoard.length; i++) {
             System.out.println();
 
-            for (int j = 0; j < ChessBoard.length; j++) {
-                System.out.print(ChessBoard[i][j]);
+            for (int j = 0; j < chessBoard.length; j++) {
+                System.out.print(chessBoard[i][j]);
             }
         }
         System.out.println();
     }
 
-    public void Gameover(String name) {
-
-        if (win == true) {
+    private void printGameOver(String name) {
+        if (win) {
             System.out.println("遊戲結束" + name + "勝利");
-        } else if (win == false) {
+        } else {
             System.out.println("遊戲結果:平手");
         }
-        System.out.println("要重來一局嗎Y/N");
-        if (input.next().equals("Y")) {
-            gamestart();
-        } else if (input.next().equals("N")) {
-            System.exit(0);
-        }
     }
 
-    public String[][] getChessBoard(){
-        return ChessBoard;
+    public String[][] getChessBoard() {
+        return chessBoard;
     }
 
-    public void CheckWin(String name, int x, int y) {
+    private void checkWinner(String name, int x, int y) {
+        checkVerticalLines(name, x, y);
+        checkHorizontalLines(name, chessBoard[x], y);
+        checkLeftDiagonalLines(name, x, y);
+        checkRightDiagonalLines(name, x, y);
+    }
 
-        int firstpoint = 0;
+    private void checkHorizontalLines(String name, String[] row, int y) {
+        int firstPoint = 0;
         int point = 0;
-        int Sidelength = ChessBoard.length - 1;
-
-        //判斷直行
-        for (int i = 1; i < 5; i++) {
-            if (x - i < 0 || ChessBoard[x][y].equals(ChessBoard[x - i][y]) == false) break;
-            firstpoint++;
-            point++;
-            if (point == 4) {
-                win = true;
-                Gameover(name);
-            }
-        }
-        for (int i = 1; i <= 5 - firstpoint; i++) {
-            if (x + i > Sidelength || ChessBoard[x][y].equals(ChessBoard[x + i][y]) == false) break;
-            point++;
-            if (point == 4) {
-                win = true;
-                Gameover(name);
-            }
-        }
-        //判斷橫行
-        firstpoint = 0;
-        point = 0;
+        int sideLength = chessBoard.length - 1;
 
         for (int i = 1; i < 5; i++) {
-            if (y - i < 0 || ChessBoard[x][y].equals(ChessBoard[x][y - i]) == false) break;
-            firstpoint++;
+            if (y - i < 0 || !row[y].equals(row[y - i])) break;
+            firstPoint++;
             point++;
             if (point == 4) {
                 win = true;
-                Gameover(name);
+                printGameOver(name);
             }
         }
-        for (int i = 1; i <= 5 - firstpoint; i++) {
-            if (y + i > Sidelength || ChessBoard[x][y].equals(ChessBoard[x][y + i]) == false) break;
+        for (int i = 1; i <= 5 - firstPoint; i++) {
+            if (y + i > sideLength || !row[y].equals(row[y + i])) break;
             point++;
             if (point == 4) {
                 win = true;
-                Gameover(name);
-            }
-        }
-        //判斷左斜
-        firstpoint = 0;
-        point = 0;
-
-        for (int i = 1; i < 5; i++) {
-            if (x - i < 0 || y - i < 0 || ChessBoard[x][y].equals(ChessBoard[x - i][y - i]) == false) break;
-            firstpoint++;
-            point++;
-            if (point == 4) {
-                win = true;
-                Gameover(name);
-            }
-        }
-        for (int i = 1; i <= 5 - firstpoint; i++) {
-            if (x + i > Sidelength || y + i > Sidelength || ChessBoard[x][y].equals(ChessBoard[x + i][y + i]) == false)
-                break;
-            point++;
-            if (point == 4) {
-                win = true;
-                Gameover(name);
-            }
-        }
-        //判斷右斜
-        firstpoint = 0;
-        point = 0;
-
-        for (int i = 1; i < 5; i++) {
-            if (x + i > Sidelength || y - i < 0 || ChessBoard[x][y].equals(ChessBoard[x + i][y - i]) == false)
-                break;
-            firstpoint++;
-            point++;
-            if (point == 4) {
-                win = true;
-                Gameover(name);
-            }
-        }
-        for (int i = 1; i <= 5 - firstpoint; i++) {
-            if (x - i < 0 || y + i > Sidelength || ChessBoard[x][y].equals(ChessBoard[x - i][y + i]) == false)
-                break;
-            point++;
-            if (point == 4) {
-                win = true;
-                Gameover(name);
+                printGameOver(name);
             }
         }
     }
+
+    private void checkVerticalLines(String name, int x, int y) {
+        int firstPoint = 0;
+        int point = 0;
+        int sideLength = chessBoard.length - 1;
+        for (int i = 1; i < 5; i++) {
+            if (x - i < 0 || !chessBoard[x][y].equals(chessBoard[x - i][y])) break;
+            firstPoint++;
+            point++;
+            if (point == 4) {
+                win = true;
+                printGameOver(name);
+            }
+        }
+        for (int i = 1; i <= 5 - firstPoint; i++) {
+            if (x + i > sideLength || !chessBoard[x][y].equals(chessBoard[x + i][y])) break;
+            point++;
+            if (point == 4) {
+                win = true;
+                printGameOver(name);
+            }
+        }
+    }
+
+    private void checkRightDiagonalLines(String name, int x, int y) {
+        int firstPoint = 0;
+        int point = 0;
+        int sideLength = chessBoard.length - 1;
+
+        for (int i = 1; i < 5; i++) {
+            if (x + i > sideLength || y - i < 0 || !chessBoard[x][y].equals(chessBoard[x + i][y - i]))
+                break;
+            firstPoint++;
+            point++;
+            if (point == 4) {
+                win = true;
+                printGameOver(name);
+            }
+        }
+        for (int i = 1; i <= 5 - firstPoint; i++) {
+            if (x - i < 0 || y + i > sideLength || !chessBoard[x][y].equals(chessBoard[x - i][y + i]))
+                break;
+            point++;
+            if (point == 4) {
+                win = true;
+                printGameOver(name);
+            }
+        }
+    }
+
+    private void checkLeftDiagonalLines(String name, int x, int y) {
+        int firstPoint = 0;
+        int point = 0;
+        int sideLength = chessBoard.length - 1;
+
+        for (int i = 1; i < 5; i++) {
+            if (x - i < 0 || y - i < 0 || !chessBoard[x][y].equals(chessBoard[x - i][y - i])) break;
+            firstPoint++;
+            point++;
+            if (point == 4) {
+                win = true;
+                printGameOver(name);
+            }
+        }
+        for (int i = 1; i <= 5 - firstPoint; i++) {
+            if (x + i > sideLength || y + i > sideLength || !chessBoard[x][y].equals(chessBoard[x + i][y + i]))
+                break;
+            point++;
+            if (point == 4) {
+                win = true;
+                printGameOver(name);
+            }
+        }
+    }
+
 }
 
