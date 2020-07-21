@@ -1,74 +1,39 @@
-package 策略模式RPG;
+package 重構策略模式RPG;
 
-import 策略模式RPG.Monster.Monster;
+import 重構策略模式RPG.Skill.FireBall;
+import 重構策略模式RPG.Skill.Freeze;
+import 重構策略模式RPG.Skill.StrengthenBody;
+import 重構策略模式RPG.Skill.WaterBall;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RpgSystem {
-    private Hero hero;
-    private List<Monster> monsters = new ArrayList<>();
-    private List<Monster> deadMonsters = new ArrayList<>();
+    private Role hero = new Hero();
+    private Monster monster = new MonsterFactory(this);
+    private List<Role> monsters = new ArrayList<>();
+    private List<Role> deadMonsters = new ArrayList<>();
 
     public RpgSystem() {
-        hero = new Hero(this);
     }
 
-    public int heroNormalAttack(Hero hero, Monster attacked) {
-        int damage = 0;
-
-        damage = hero.getAtk() - attacked.getDef();
-        if (damage > 0) {
-            attacked.setHp(attacked.getHp() - damage);
-            return damage;
-        }
-
-        return 0;
+    public void setInitialHeroSkill() {
+        hero.getSkills().add(new FireBall());
+        hero.getSkills().add(new Freeze());
+        hero.getSkills().add(new StrengthenBody());
+        hero.getSkills().add(new WaterBall(this));
     }
 
-    public int monsterNormalAttack(Monster attack, Hero attacked) {
-        int damage = 0;
-
-        damage = attack.getAtk() - attacked.getDef();
-        if (damage > 0) {
-            attacked.setHp(attacked.getHp() - damage);
-            return damage;
-        }
-        return 0;
-
+    public int normalAttack(Role attack, Role attacked) {
+        return new Attack().attack(attack, attacked);
     }
 
-    public int heroSkillAttack(int selectSkill, Hero hero, Monster attacked) {
-        int damage;
-
-        damage = hero.getSkills()[selectSkill].skillAttack(hero, attacked);
-
-        return damage;
+    public int skillAttack(int selectSkill, Role attack, Role attacked) {
+        return attack.getSkills().get(selectSkill).skillAttack(attack, attacked);
     }
 
-    public int monsterSkillAttack(Monster attack, Hero attacked) {
-        int damage;
-
-        damage = attack.getSkill().skillAttack(attack, attacked);
-
-        return damage;
-
-    }
-
-    public Hero getHero() {
-        return hero;
-    }
-
-    public void setHero(Hero hero) {
-        this.hero = hero;
-    }
-
-    public List<Monster> getMonsters() {
-        return monsters;
-    }
-
-    public void setMonsters(List<Monster> monsters) {
-        this.monsters = monsters;
+    public void createMonster() {
+        monster.createAll();
     }
 
     public void resetHeroState() {
@@ -79,7 +44,10 @@ public class RpgSystem {
         hero.setMdf(10);
     }
 
-    public boolean checkHeroUseSkillMp(int skillMp, Hero hero) {
+    public boolean checkHeroUseSkillMp(int skillMp, Role hero) {
+        if (skillMp > hero.getMp()) {
+            System.out.println("魔力不足請重新選擇");
+        }
         return skillMp < hero.getMp();
     }
 
@@ -87,13 +55,40 @@ public class RpgSystem {
         return hero.getHp() > 0;
     }
 
-    public List<Monster> checkMonsterAlive() {
-        for (int i = 0; i < monsters.size(); i++) {
+    public void checkMonsterAlive() {
+        for (int i = monsters.size() - 1; i >= 0; i--) {
             if (monsters.get(i).getHp() <= 0) {
                 deadMonsters.add(monsters.get(i));
                 monsters.remove(i);
             }
         }
+    }
+
+    public void aiAttackMethod() {
+        new MonsterAttack(this).aiAttack();
+    }
+
+    public Role getHero() {
+        return hero;
+    }
+
+    public void setHero(Role hero) {
+        this.hero = hero;
+    }
+
+    public void setMonsters(List<Role> monsters) {
+        this.monsters = monsters;
+    }
+
+    public List<Role> getDeadMonsters() {
         return deadMonsters;
+    }
+
+    public void setDeadMonsters(List<Role> deadMonsters) {
+        this.deadMonsters = deadMonsters;
+    }
+
+    public List<Role> getMonsters() {
+        return monsters;
     }
 }
