@@ -5,6 +5,7 @@ import 策略模式RPG.Monster.Monster;
 import 策略模式RPG.RpgSystem;
 
 public class Lightning implements MonsterSkill {
+    private String describe;
     private int consumeMP;
     private String name;
     private RpgSystem rpg;
@@ -13,6 +14,7 @@ public class Lightning implements MonsterSkill {
         this.name = "雷擊";
         this.rpg = rpg;
         this.consumeMP = 100;
+        this.describe = "雷擊：消耗100點MP、造成魔法傷害250點";
     }
 
     @Override

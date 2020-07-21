@@ -80,9 +80,7 @@ public class Main {
         }
         System.out.println();
 
-
     }
-
 
     public static void selectAttackMethod() throws InterruptedException {
         int select;
@@ -177,12 +175,12 @@ public class Main {
     private static boolean judgementLeftMonster() {
         deadMonsters = rpg.checkMonsterAlive();
 
-        for (Monster montser : deadMonsters) {
-            System.out.println("[怪物]" + montser.getName() + "已倒下");
+        for (Monster monster : deadMonsters) {
+            System.out.println("[怪物]" + monster.getName() + "已倒下");
         }
         deadMonsters.clear();
-        for (Monster montser : monsters) {
-            System.out.println("[怪物]" + montser.getName() + "還剩下" + montser.getHp() + "血量");
+        for (Monster monster : monsters) {
+            System.out.println("[怪物]" + monster.getName() + "還剩下" + monster.getHp() + "血量");
         }
 
         if (monsters.isEmpty()) {
@@ -208,7 +206,7 @@ public class Main {
                 System.out.println("魔力不足請重新選擇");
             }
 
-        } while (selectSkillNumber > heroSkill.length - 1 || selectSkillNumber < 0 || !mpNotEnough);
+        } while (selectSkillNumber > heroSkill.length - 1 || !mpNotEnough);
 
         return selectSkillNumber;
     }

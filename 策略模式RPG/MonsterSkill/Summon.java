@@ -8,6 +8,7 @@ import 策略模式RPG.Monster.Soldier;
 import 策略模式RPG.Monster.Witch;
 
 public class Summon implements MonsterSkill {
+    private String describe;
     private String name;
     private RpgSystem rpg;
     private int consumeMp;
@@ -17,6 +18,7 @@ public class Summon implements MonsterSkill {
         this.rpg = rpg;
         this.name = "召喚";
         this.consumeMp = 50;
+        this.describe = "召喚：消耗50點MP、場上增加一位敵人 (士兵、護衛隊 或 法師)";
     }
 
     @Override
