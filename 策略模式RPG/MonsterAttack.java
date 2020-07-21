@@ -2,7 +2,7 @@ package 重構策略模式RPG;
 
 import java.util.List;
 
-public class MonsterAttack implements AiAttack {
+public class MonsterAttack implements AiAttackLogic {
     RpgSystem rpg;
     List<Role> monsters;
 
@@ -38,6 +38,7 @@ public class MonsterAttack implements AiAttack {
                     monsters.get(i).setActionCount(monsters.get(i).getActionCount() - 1);
                     if (monsters.get(i).getActionCount() == 0) {
                         monsters.get(i).setAction(true);
+                        System.out.println("[怪物]"+ monsters.get(i).getName()+"已解凍");
                     }
                 }
 
