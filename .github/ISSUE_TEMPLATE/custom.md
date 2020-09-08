@@ -4,7 +4,7 @@ about: Describe this issue template's purpose here.
 title: ''
 labels: ''
 assignees: a8901053
-projects: test
+projects: https://github.com/a8901053/JavaPractice/projects/1
 
 ---
 
